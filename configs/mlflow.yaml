@@ -1,0 +1,97 @@
+# configs/mlflow.yaml
+# Centralized MLflow configuration for ExoHunter.
+
+# ----------------------------------------------------
+# Active profile: choose which block under `profiles`
+# to load in your training scripts/pipelines.
+# Options: local, docker
+# ----------------------------------------------------
+active_profile: local
+
+# ----------------------------------------------------
+# Profiles
+# ----------------------------------------------------
+profiles:
+
+  # ------------------------
+  # Local development
+  # ------------------------
+  local:
+    # Tracking server
+    tracking_uri: ${MLFLOW_TRACKING_URI:-file://${PROJECT_DIR}/ml/artifacts/mlruns}
+    # If you run `mlflow server`, you can set:
+    # tracking_uri: ${MLFLOW_TRACKING_URI:-http://127.0.0.1:5001}
+
+    # Experiment where runs will be logged by default
+    experiment_name: ${MLFLOW_EXPERIMENT_NAME:-ExoHunter-Dev}
+
+    # Where to store artifacts (models, plots, etc.)
+    # file:// path keeps it simple for local use
+    artifact_store: ${MLFLOW_ARTIFACT_STORE:-file://${PROJECT_DIR}/ml/artifacts}
+
+    # Optional DB backend (default is file-based inside mlruns)
+    # For a single-user local setup, you can keep it empty.
+    # For a shared setup, use SQLite/Postgres:
+    # backend_store_uri: sqlite:///${PROJECT_DIR}/ml/artifacts/mlflow.db
+    backend_store_uri: ${MLFLOW_BACKEND_STORE_URI:-}
+
+    # Auto-logging toggles (sklearn, pyspark, etc.)
+    autolog:
+      sklearn: true
+      pyspark: false
+      xgboost: false
+      lightgbm: false
+
+    # Model registry (optional; requires a server backend + DB)
+    model_registry:
+      enabled: false
+      # registry_uri: postgresql://user:pass@host:5432/mlflow
+
+    # Environment variable passthrough (useful in notebooks)
+    env:
+      PROJECT_DIR: ${PROJECT_DIR:-${PWD}}
+      FEATURE_VERSION: ${FEATURE_VERSION:-v1}
+      MODEL_VERSION: ${MODEL_VERSION:-baseline}
+
+  # ------------------------
+  # Docker / Compose profile
+  # ------------------------
+  docker:
+    # If you run an MLflow server service in docker-compose (port 5001)
+    tracking_uri: ${MLFLOW_TRACKING_URI:-http://mlflow:5001}
+    experiment_name: ${MLFLOW_EXPERIMENT_NAME:-ExoHunter}
+    # Artifacts persisted on a shared volume
+    artifact_store: ${MLFLOW_ARTIFACT_STORE:-/app/ml/artifacts}
+    # Example backend store via SQLite inside a mounted volume
+    backend_store_uri: ${MLFLOW_BACKEND_STORE_URI:-sqlite:////app/ml/artifacts/mlflow.db}
+
+    autolog:
+      sklearn: true
+      pyspark: false
+      xgboost: false
+      lightgbm: false
+
+    model_registry:
+      enabled: true
+      # If using the same tracking server, Registry URI is implicit.
+      # registry_uri: ${MLFLOW_REGISTRY_URI:-http://mlflow:5001}
+
+    env:
+      PROJECT_DIR: ${PROJECT_DIR:-/app}
+      FEATURE_VERSION: ${FEATURE_VERSION:-v1}
+      MODEL_VERSION: ${MODEL_VERSION:-baseline}
+
+# ----------------------------------------------------
+# Notes:
+# - To use a dedicated MLflow server locally:
+#   mlflow server --backend-store-uri sqlite:///ml/artifacts/mlflow.db \
+#                 --default-artifact-root file://$(pwd)/ml/artifacts \
+#                 --host 127.0.0.1 --port 5001
+#   Then set MLFLOW_TRACKING_URI=http://127.0.0.1:5001
+#
+# - For S3/GCS artifact store, set MLFLOW_ARTIFACT_STORE accordingly, e.g.:
+#   MLFLOW_ARTIFACT_STORE=s3://my-exohunter-artifacts
+#   and export credentials in environment variables (AWS_* / GCS creds).
+#
+# - `PROJECT_DIR` is used to resolve local paths; override as needed.
+# ----------------------------------------------------

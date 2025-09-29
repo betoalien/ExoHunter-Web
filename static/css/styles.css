@@ -1,0 +1,331 @@
+/* ---------------------------------------------------
+   Base Reset & Typography
+--------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color: #222;
+  background-color: #f9f9fb;
+}
+
+h1, h2, h3, h4, h5 {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 1rem 0;
+}
+
+a {
+  color: #004aad;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  width: min(100%, 1200px);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* ---------------------------------------------------
+   Header & Navigation
+--------------------------------------------------- */
+.site-header {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.brand-link {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-list a {
+  color: #fff;
+  font-weight: 500;
+}
+
+.nav-list a:hover {
+  color: #f5f5f5;
+}
+
+/* ---------------------------------------------------
+   Hero Section
+--------------------------------------------------- */
+.hero {
+  position: relative;
+  background-image: url("https://assets.science.nasa.gov/dynamicimage/assets/science/astro/exo-explore/2023/09/h/holiday16x9.jpg?w=1600&h=900&fit=clip&crop=faces%2Cfocalpoint");
+  background-size: cover;
+  background-position: center;
+  height: 40vh;
+  min-height: 280px;
+  max-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  font-size: 1.125rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------------------------------------------------
+   Sections & Cards
+--------------------------------------------------- */
+.section {
+  margin: 2rem 0;
+}
+
+.card {
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.section-header {
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* ---------------------------------------------------
+   Forms
+--------------------------------------------------- */
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+input[type="file"],
+input[type="url"],
+input[type="number"],
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+}
+
+input:focus {
+  border-color: #004aad;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,74,173,0.15);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-switch {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.switch-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ---------------------------------------------------
+   Buttons
+--------------------------------------------------- */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #004aad;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #003a89;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #004aad;
+  border: 1px solid #004aad;
+}
+
+.btn-ghost:hover {
+  background: rgba(0,74,173,0.05);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ---------------------------------------------------
+   Table
+--------------------------------------------------- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------
+   Status Messages
+--------------------------------------------------- */
+.status {
+  margin-top: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.status--info {
+  background: #e6f0ff;
+  color: #004aad;
+}
+
+.status--success {
+  background: #e6f9f0;
+  color: #0b8f5c;
+}
+
+.status--warn {
+  background: #fff8e1;
+  color: #a67800;
+}
+
+.status--error {
+  background: #fdecea;
+  color: #d93025;
+}
+
+/* ---------------------------------------------------
+   Footer
+--------------------------------------------------- */
+.site-footer {
+  background: #0a0a0a;
+  color: #fff;
+  padding: 1.5rem 0;
+  margin-top: 2rem;
+}
+
+.footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.footer-links a {
+  color: #fff;
+  margin-left: 1rem;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------
+   Utilities
+--------------------------------------------------- */
+.is-hidden {
+  display: none !important;
+}
+
+.no-js-warning {
+  background: #d93025;
+  color: #fff;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+/* Row/cell coloring based on disposition comparison */
+.disp-green { color: #1a7f37; }  /* o bg sutil si prefieres */
+.disp-black { color: inherit; }
+.disp-red   { color: #b42318; }

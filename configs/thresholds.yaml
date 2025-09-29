@@ -1,0 +1,44 @@
+# configs/thresholds.yaml
+# Thresholds for classification rules in ExoHunter
+# All values can be overridden here without changing the code.
+
+# ---------------------------
+# Planet size categories (radius in Earth radii)
+# ---------------------------
+planet_radius:
+  rocky_max: 2.0              # < 2 R⊕ → rocky_candidate
+  super_earth_max: 6.0        # 2–6 R⊕ → super_earth_or_mini_neptune
+  gas_giant_min: 6.0          # ≥ 6 R⊕ → likely_gas_giant
+  hot_jupiter_min: 8.0        # ≥ 8 R⊕ AND short period → hot_jupiter_candidate
+
+# ---------------------------
+# Orbital period categories (days)
+# ---------------------------
+orbital_period:
+  hot_jupiter_max: 10         # ≤ 10 d → used with radius ≥ 8 R⊕
+
+# ---------------------------
+# Equilibrium temperature Teq (Kelvin)
+# ---------------------------
+temperature:
+  hot_min: 1000               # ≥ 1000 K → hot_jupiter_candidate
+  habitable_min: 180          # 180–310 K → habitable_zone_candidate
+  habitable_max: 310
+
+# ---------------------------
+# Insolation flux relative to Earth (F/F⊕)
+# ---------------------------
+insolation:
+  habitable_min: 0.5
+  habitable_max: 2.0
+
+# ---------------------------
+# Anomalous signal triggers
+# These thresholds flag potential "Anomalous Signal"
+# ---------------------------
+anomalous:
+  max_radius: 30              # > 30 R⊕ → too large for planet
+  max_depth: 0.05             # > 5% drop in stellar flux (δ) for Sun-like → unusual
+  duration_ratio_low: 0.5     # observed_duration / expected_duration < 0.5
+  duration_ratio_high: 1.8    # observed_duration / expected_duration > 1.8
+  teq_low: 80                 # Teq < 80 K with deep transit → anomaly

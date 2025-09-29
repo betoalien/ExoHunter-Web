@@ -1,0 +1,116 @@
+# ml/feature_specs.yaml
+# Feature definitions for ExoHunter ML pipelines.
+# Used by services/feature_builder.py and pipelines/make_dataset.py.
+
+# ---------------------------
+# Basic configuration
+# ---------------------------
+version: v1
+created: 2025-09-27
+description: >
+  Feature specification for KOI-derived dataset. Defines which columns
+  are selected, how they are transformed, and how missing values are handled.
+
+# ---------------------------
+# Input features
+# ---------------------------
+features:
+
+  # Orbital parameters
+  - name: koi_period
+    type: numeric
+    description: Orbital period (days)
+    transform: log1p          # log(1+x) to compress long-tail distribution
+    impute: median
+
+  - name: koi_sma
+    type: numeric
+    description: Semi-major axis (AU)
+    transform: log1p
+    impute: median
+
+  # Planet physical
+  - name: koi_prad
+    type: numeric
+    description: Planet radius (R⊕)
+    transform: standardize
+    impute: median
+
+  - name: koi_teq
+    type: numeric
+    description: Equilibrium temperature (K)
+    transform: standardize
+    impute: median
+
+  - name: koi_insol
+    type: numeric
+    description: Insolation flux relative to Earth
+    transform: log1p
+    impute: median
+
+  # Stellar parameters
+  - name: koi_smass
+    type: numeric
+    description: Stellar mass (M☉)
+    transform: standardize
+    impute: median
+
+  - name: koi_srad
+    type: numeric
+    description: Stellar radius (R☉)
+    transform: standardize
+    impute: median
+
+  - name: koi_slogg
+    type: numeric
+    description: Stellar surface gravity (log g)
+    transform: standardize
+    impute: median
+
+# ---------------------------
+# Derived / computed features
+# ---------------------------
+derived:
+
+  - name: transit_depth
+    type: numeric
+    description: Fractional flux drop δ = (Rp/Rs)^2
+    source: compute_metrics
+    transform: none
+    impute: zero
+
+  - name: density_est
+    type: numeric
+    description: Approximate density (g/cm³) if mass proxy available
+    source: compute_metrics
+    transform: standardize
+    impute: median
+
+# ---------------------------
+# Categorical features
+# ---------------------------
+categorical:
+
+  - name: stellar_type
+    description: Discretized stellar type (F, G, K, M)
+    encoding: onehot
+    impute: most_frequent
+
+# ---------------------------
+# Target label
+# ---------------------------
+target:
+  name: label
+  description: >
+    ExoHunter classification label.
+    One of:
+      - confirmed_planet
+      - candidate
+      - rocky_candidate
+      - super_earth_or_mini_neptune
+      - hot_jupiter_candidate
+      - habitable_zone_candidate
+      - likely_false_positive
+      - anomalous_signal
+      - no_result
+  encoding: categorical

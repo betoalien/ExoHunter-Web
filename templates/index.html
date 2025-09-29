@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1" />
+  <title>ExoHunter · Analyze Exoplanet Datasets</title>
+
+  <!-- Global styles -->
+  <link rel="stylesheet" href="/static/css/styles.css" />
+
+  <meta name="description" content="ExoHunter — Upload KOI datasets, compute metrics, classify candidates, and prep data for ML anomaly detection." />
+  <meta name="color-scheme" content="light dark" />
+</head>
+<body>
+  <noscript>
+    <div class="no-js-warning" role="alert">
+      JavaScript is required to use ExoHunter.
+    </div>
+  </noscript>
+
+  <!-- Header / Top Nav -->
+  <header class="site-header" role="banner">
+    <nav class="nav container" aria-label="Primary">
+      <div class="brand">
+        <a class="brand-link" href="/">ExoHunter</a>
+      </div>
+      <ul class="nav-list">
+        <li><a href="/">Home</a></li>
+        <li><a href="/results">Results</a></li>
+        <li><a href="/healthz" target="_blank" rel="noopener">Health</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero (background image set in CSS)
+       .hero { background-image: url("https://assets.science.nasa.gov/dynamicimage/assets/science/astro/exo-explore/2023/09/h/holiday16x9.jpg?w=1600&h=900&fit=clip&crop=faces%2Cfocalpoint"); } -->
+  <section class="hero" role="region" aria-label="Header banner">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container">
+      <h1 class="hero-title">ExoHunter</h1>
+      <p class="hero-subtitle">
+        Analyze KOI datasets, compute orbital metrics, classify candidates,
+        and surface <em>anomalous signals</em> for ML review.
+      </p>
+      <a class="btn btn-primary" href="#uploader">Get Started</a>
+    </div>
+  </section>
+
+  <main id="main" class="container" role="main">
+    <!-- Uploader -->
+    <section id="uploader" class="card section">
+      <header class="section-header">
+        <h2>Upload Dataset</h2>
+        <p class="section-subtitle">
+          Upload a local CSV/Parquet or provide a bucket URL. Max size is controlled by <code>MAX_CONTENT_LENGTH_MB</code>.
+        </p>
+      </header>
+
+      <div class="upload-switch">
+        <label class="switch-item">
+          <input type="radio" name="upload-mode" value="file" checked />
+          <span>Local File</span>
+        </label>
+        <label class="switch-item">
+          <input type="radio" name="upload-mode" value="url" />
+          <span>Bucket URL</span>
+        </label>
+      </div>
+
+      <form id="uploadForm" class="form-grid" enctype="multipart/form-data" novalidate>
+        <!-- Local file input -->
+        <div class="form-row" data-mode="file">
+          <label for="fileInput" class="form-label">Select file (.csv or .parquet)</label>
+          <input id="fileInput" name="file" type="file" accept=".csv,.parquet" />
+        </div>
+
+        <!-- Bucket URL input -->
+        <div class="form-row is-hidden" data-mode="url">
+          <label for="bucketUrl" class="form-label">Bucket URL</label>
+          <input id="bucketUrl" name="url" type="url" placeholder="s3://bucket/path/to/data.parquet" />
+        </div>
+
+        <div class="form-actions">
+          <button id="btnUpload" type="submit" class="btn btn-primary">Upload</button>
+          <button id="btnResetUpload" type="button" class="btn btn-ghost">Reset</button>
+        </div>
+      </form>
+
+      <div id="uploadStatus" class="status" role="status" aria-live="polite"></div>
+      <output id="uploadMeta" class="output"></output>
+    </section>
+
+    <!-- Schema detection -->
+    <section id="schema" class="card section">
+      <header class="section-header">
+        <h2>Schema Detection</h2>
+        <p class="section-subtitle">
+          Detected columns are normalized to KOI standard (e.g., <code>koi_period</code>, <code>koi_prad</code>, <code>koi_teq</code>).
+        </p>
+      </header>
+
+      <div class="schema-grid">
+        <div class="schema-summary">
+          <div><strong>File ID:</strong> <span id="fileId">—</span></div>
+          <div><strong>Engine:</strong> <span id="engineName">—</span></div>
+          <div><strong>Rows:</strong> <span id="rowCount">—</span></div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="schemaTable" class="table">
+            <thead>
+              <tr>
+                <th>Detected Column</th>
+                <th>Mapped To</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Filled by /static/js/app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="helper">
+        <a class="link" href="/api/schema" target="_blank" rel="noopener">View KOI mapping (API)</a>
+      </div>
+    </section>
+
+    <!-- Processing options -->
+    <section id="processing" class="card section">
+      <header class="section-header">
+        <h2>Process Dataset</h2>
+        <p class="section-subtitle">
+          Configure assumptions and thresholds, then compute derived metrics and classifications.
+        </p>
+                  <!-- FAQ button -->
+          <div style="flex:0 0 auto; padding-left: .5rem;">
+            <button id="btnAlbedoFAQ" type="button" class="btn btn-ghost" aria-expanded="false" aria-controls="albedoFAQ">
+              FAQ
+            </button>
+          </div>
+      </header>
+
+      <form id="processForm" class="form-grid" novalidate>
+        <div class="form-row" style="align-items: end;">
+          <div style="flex:1 1 auto;">
+            <label for="albedo" class="form-label">Assumed Albedo</label>
+            <input id="albedo" name="albedo" type="number" step="0.01" min="0" max="1" value="0.3" />
+          </div>
+        </div>
+
+        <!-- Collapsible FAQ panel -->
+        <div id="albedoFAQ" class="card is-hidden" style="margin-top:.75rem;" role="region" aria-label="Albedo FAQ">
+          <div class="section-header" style="margin-bottom:.5rem;">
+            <h3 style="margin:0;">What is albedo and why default to 0.3?</h3>
+            <p class="section-subtitle" style="margin:.25rem 0 0 0;">
+              Albedo is the fraction of starlight reflected by the planet. It affects the equilibrium temperature:
+              <code>T_eq = T_s √(R_s / 2a) · (1 − A)^{1/4}</code>.
+              Higher albedo → cooler; lower albedo → hotter. Earth’s average is ≈0.3.
+            </p>
+          </div>
+
+          <div class="table-wrap" style="overflow:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Albedo (A)</th>
+                  <th>(1 − A)^{1/4}</th>
+                  <th>Example T_eq if base is 280 K</th>
+                  <th>Qualitative impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>0.0</td><td>1.0000</td><td>280 K</td><td>Max absorption → hottest</td></tr>
+                <tr><td>0.1</td><td>0.9740</td><td>272.7 K</td><td>Hotter than Earth-like</td></tr>
+                <tr><td>0.3</td><td>0.9147</td><td>256.1 K</td><td>Earth-like default</td></tr>
+                <tr><td>0.5</td><td>0.8409</td><td>235.5 K</td><td>Cloudy/icy → cooler</td></tr>
+                <tr><td>0.7</td><td>0.7401</td><td>207.2 K</td><td>Very reflective → much cooler</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="helper" style="margin-top:.5rem;">
+            Changing albedo only affects <code>T_eq</code> (temperature). The incident flux (insolation) does not depend on albedo.
+            Your classifications that rely on <code>T_eq</code> (e.g., “habitable zone candidate”) will shift accordingly.
+          </p>
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox">
+            <input id="autoDerive" name="autoDerive" type="checkbox" checked />
+            <span>Auto-derive metrics (a, T<sub>eq</sub>, Insolation) when missing</span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button id="btnProcess" type="submit" class="btn btn-primary">Run Processing</button>
+          <button id="btnCancelProcess" type="button" class="btn btn-ghost">Cancel</button>
+        </div>
+      </form>
+
+      <div id="processStatus" class="status" role="status" aria-live="polite"></div>
+      <output id="processMeta" class="output"></output>
+    </section>
+
+    <!-- Results quick access -->
+    <section id="results-shortcut" class="card section">
+      <header class="section-header">
+        <h2>Results</h2>
+        <p class="section-subtitle">
+          After processing, download the CSV/JSON report or open the results page.
+        </p>
+      </header>
+
+      <div class="results-actions">
+        <a id="linkResultsPage" class="btn btn-primary" href="/results">Open Results Page</a>
+        <a id="linkDownloadCSV" class="btn btn-ghost" href="#" download>Download CSV</a>
+        <a id="linkDownloadJSON" class="btn btn-ghost" href="#" download>Download JSON</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-grid">
+      <div>
+        <strong>ExoHunter</strong><br />
+        <small>© 2025. Anomaly-first exoplanet analytics.</small>
+      </div>
+      <div class="footer-links">
+        <a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" rel="noopener">NASA Exoplanet Archive</a>
+        <a href="https://www.nasa.gov/" target="_blank" rel="noopener">NASA</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Global scripts -->
+  <script src="/static/js/app.js" defer></script>
+
+  <!-- Tiny inline script to toggle the FAQ card -->
+  <script>
+    (function () {
+      const btn = document.getElementById("btnAlbedoFAQ");
+      const panel = document.getElementById("albedoFAQ");
+      if (!btn || !panel) return;
+
+      const hiddenClass = "is-hidden";
+      const toggle = () => {
+        const isHidden = panel.classList.contains(hiddenClass);
+        if (isHidden) {
+          panel.classList.remove(hiddenClass);
+          btn.setAttribute("aria-expanded", "true");
+        } else {
+          panel.classList.add(hiddenClass);
+          btn.setAttribute("aria-expanded", "false");
+        }
+      };
+
+      btn.addEventListener("click", toggle);
+    })();
+  </script>
+</body>
+</html>

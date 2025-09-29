@@ -1,0 +1,32 @@
+{
+  "object_id": ["kepid", "koi_name", "kepoi_name", "rowid", "id"],
+
+  "koi_period": ["koi_period", "orbital_period", "period_days", "p", "pl_orbper"],
+  "koi_prad": ["koi_prad", "planet_radius", "radius_re", "rp", "pl_rade"],
+  "koi_sma": ["koi_sma", "semi_major_axis", "a", "sma", "pl_orbsmax"],
+
+  "koi_teq": ["koi_teq", "teq", "equilibrium_temp", "planet_temp", "pl_eqt"],
+  "koi_insol": ["koi_insol", "insolation", "flux", "instellation", "pl_insol"],
+
+  "koi_smass": ["koi_smass", "stellar_mass", "mass_star", "ms", "st_mass"],
+  "koi_srad": ["koi_srad", "stellar_radius", "rs", "st_rad"],
+  "koi_slogg": ["koi_slogg", "logg", "stellar_logg", "surface_gravity", "st_logg"],
+  "koi_steff": ["koi_steff", "teff", "stellar_teff", "effective_temp", "st_teff"],
+
+  "koi_disposition": [
+    "koi_disposition",
+    "disposition",
+    "nasa_disposition",
+    "pl_disposition",
+    "final_disposition",
+    "koi_disp",
+    "planet_disposition"
+  ],
+
+  "transit_depth": ["depth", "delta_flux", "transit_depth", "koi_depth"],
+  "density_est": ["density", "rho", "planet_density", "est_density"],
+
+  "category": ["category", "exo_category", "label_class"],
+  "score": ["score", "confidence", "probability"],
+  "flags": ["flags", "diagnostics", "notes"]
+}

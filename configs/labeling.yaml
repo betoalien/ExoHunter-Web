@@ -1,0 +1,59 @@
+# configs/labeling.yaml
+# Rules and priorities for human labeling in ExoHunter.
+# Used by services/labeling_queue.py to select candidates for review.
+
+# ---------------------------
+# General settings
+# ---------------------------
+batch:
+  size: 50             # default number of objects to send to labeling queue
+  strategy: priority   # strategies: priority, random, uncertainty
+
+# ---------------------------
+# Priority categories
+# Categories are checked in order.
+# ---------------------------
+priority:
+  - anomalous_signal       # Always review anomalies first
+  - candidate              # Review KOI candidates not yet confirmed
+  - habitable_zone_candidate
+  - rocky_candidate
+
+# ---------------------------
+# Heuristic flags
+# Objects with these flags are considered "interesting" and bumped in priority.
+# ---------------------------
+interesting_flags:
+  - FLAG_ANOMALOUS_PERIOD
+  - FLAG_ANOMALOUS_DEPTH
+  - FLAG_DURATION_INCONSISTENT
+  - FLAG_MISSING_PRAD
+  - FLAG_ASSUMED_ALBEDO
+
+# ---------------------------
+# Scoring weights
+# Used to compute a "labeling_score" for ranking.
+# ---------------------------
+weights:
+  category:
+    anomalous_signal: 5.0
+    candidate: 3.0
+    habitable_zone_candidate: 2.5
+    rocky_candidate: 2.0
+    hot_jupiter_candidate: 1.5
+    likely_false_positive: -1.0
+    no_result: -2.0
+  flags:
+    default: 0.5    # extra weight per interesting flag
+  uncertainty:
+    enabled: true
+    factor: 2.0     # if model uncertainty is high, double the score
+
+# ---------------------------
+# Exclusions
+# Any object matching these will be skipped for labeling.
+# ---------------------------
+exclude:
+  dispositions:
+    - confirmed_planet    # already confirmed by NASA dataset
+    - likely_false_positive

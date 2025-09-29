@@ -1,0 +1,106 @@
+# ml/splits.yaml
+# Rules for dataset splitting in ExoHunter ML experiments.
+
+# -------------------------------------------
+# Global defaults
+# -------------------------------------------
+seed: 1337                 # Reproducibility
+target_col: label          # Classification target
+group_col: star_id         # Prevent leakage: keep all objects of a star in the same split
+id_col: object_id          # Row identifier (for logs/manifests)
+
+# -------------------------------------------
+# Primary split (train/val/test)
+# -------------------------------------------
+primary:
+  method: grouped_stratified   # options: grouped_stratified, grouped_random, stratified, random
+  ratios:
+    train: 0.70
+    val:   0.15
+    test:  0.15
+
+  # Stratify by label to preserve class distribution (after grouping).
+  stratify: true
+
+  # Minimum samples required per class in each split (best-effort).
+  min_per_class:
+    train: 10
+    val:   3
+    test:  3
+
+  # Handle rare classes (e.g., anomalous_signal):
+  rare_classes:
+    names:
+      - anomalous_signal
+      - no_result
+    strategy: keep_together   # options: keep_together, oversample_train, drop_if_too_small
+    oversample_factor: 3      # only used if strategy=oversample_train
+
+# -------------------------------------------
+# Cross-validation config (optional)
+# -------------------------------------------
+cv:
+  enabled: false
+  method: grouped_kfold       # options: grouped_kfold, stratified_kfold, kfold
+  folds: 5
+  shuffle: true
+
+# -------------------------------------------
+# Temporal split (optional experiment)
+# If your data has timestamps, you can evaluate temporal generalization.
+# -------------------------------------------
+temporal:
+  enabled: false
+  time_col: discovery_date    # or first_obs_date / koi_time if available
+  scheme:
+    # Example: train on older, validate on recent, test on newest slice
+    train_until: 2014-12-31
+    val_until:   2016-12-31
+    test_after:  2017-01-01
+
+# -------------------------------------------
+# Filters & exclusions (applied before splitting)
+# -------------------------------------------
+filters:
+  # Keep only rows with minimal required columns for features
+  require_non_null:
+    - koi_period
+    - koi_prad
+  # Optional numeric sanity ranges (rows outside are dropped prior to split)
+  ranges:
+    koi_period: [0.1, 1.0e4]  # days
+    koi_prad:   [0.1, 1.0e3]  # Earth radii
+
+exclude:
+  # Exclude labels from supervised training if desired
+  labels:
+    - no_result               # not informative for supervised learning
+  # Exclude official confirmations from NASA if you only want to learn "candidate-like" patterns
+  dispositions:
+    - confirmed_planet        # toggle off if you want it included
+
+# -------------------------------------------
+# Class balancing (applied inside training loop, not here)
+# These flags are recorded here for pipeline awareness.
+# -------------------------------------------
+class_balance:
+  strategy: none              # options: none, weight, oversample, undersample
+  weight_scheme: "balanced"   # if strategy=weight (e.g., sklearn class_weight="balanced")
+  oversample_max_factor: 3    # cap for oversampling
+  undersample_min_fraction: 0.2
+
+# -------------------------------------------
+# Outputs
+# -------------------------------------------
+outputs:
+  manifest_dir: ml/eval/      # where to write split manifests (json)
+  save_index_files: true      # write {train,val,test}_index.txt with object_id
+  tag: "v1"                   # label used in filenames (e.g., splits_v1.manifest.json)
+
+# -------------------------------------------
+# Notes
+# - grouped_* methods require `group_col` present in the dataset.
+# - If `star_id` is missing, set group_col to a stable surrogate (e.g., host_name).
+# - For extreme class imbalance, prefer cv.enabled=true + class_balance.weight or oversample.
+# - Temporal split is mutually exclusive with CV in most workflows; enable one at a time.
+# -------------------------------------------
