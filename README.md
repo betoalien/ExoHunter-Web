@@ -175,6 +175,10 @@ Labeling priorities editable in configs/labeling.yaml.
 ```
 
 ------
+## Testing
+Test this project, visit https://exohunter-60bacde2a816.herokuapp.com/
+
+------
 
 ## Contact me
 
