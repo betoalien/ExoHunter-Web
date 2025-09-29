@@ -172,3 +172,12 @@ Use Parquet for large-scale data.
 Classification thresholds adjustable in configs/thresholds.yaml.
 
 Labeling priorities editable in configs/labeling.yaml.
+```
+
+------
+
+## Contact me
+
+For questions or contributions, open an issue or PR on GitHub.
+Email: conect@albertocardenas.com
+Website: https://www.albertocardenas.com
