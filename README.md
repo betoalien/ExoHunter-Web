@@ -142,8 +142,8 @@ web_app/
 
 ```bash
 # Clone and enter project
-git clone https://github.com/betoalien/ExoHunter.git
-cd ExoHunter/web_app
+git clone https://github.com/betoalien/ExoHunter-Web.git
+cd ExoHunter-Web
 
 # Create virtual environment
 python -m venv venv
